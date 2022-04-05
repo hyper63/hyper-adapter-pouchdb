@@ -1,4 +1,10 @@
-// deno-lint-ignore-file no-unused-vars
+import { crocks, HyperErr, R } from "./deps.js";
+
+import { handleHyperErr } from "./utils.js";
+
+const { Async } = crocks;
+
+const { always } = R;
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -41,69 +47,101 @@
  * @property {boolean} ok
  */
 
-export default function (_env) {
+export default function ({ db: metaDb }) {
   /**
    * @param {string} name
    * @returns {Promise<Response>}
    */
-  async function createDatabase(name) {}
+  function createDatabase(name) {
+    return metaDb.create(name)
+      .map(always({ ok: true }))
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
+  }
 
   /**
    * @param {string} name
    * @returns {Promise<Response>}
    */
-  async function removeDatabase(name) {}
+  function removeDatabase(name) {
+    return metaDb.remove(name)
+      .map(always({ ok: true }))
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
+  }
 
   /**
    * @param {CreateDocumentArgs}
    * @returns {Promise<Response>}
    */
-  async function createDocument({ db, id, doc }) {}
+  function createDocument({ db, id, doc }) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   /**
    * @param {RetrieveDocumentArgs}
    * @returns {Promise<Response>}
    */
-  async function retrieveDocument({ db, id }) {}
+  function retrieveDocument({ db, id }) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   /**
    * @param {CreateDocumentArgs}
    * @returns {Promise<Response>}
    */
-  async function updateDocument({ db, id, doc }) {}
+  function updateDocument({ db, id, doc }) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   /**
    * @param {RetrieveDocumentArgs}
    * @returns {Promise<Response>}
    */
-  async function removeDocument({ db, id }) {}
+  function removeDocument({ db, id }) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   /**
    * @param {QueryDocumentsArgs}
    * @returns {Promise<Response>}
    */
-  async function queryDocuments({ db, query }) {}
+  function queryDocuments({ db, query }) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   /**
    * @param {IndexDocumentArgs}
    * @returns {Promise<Response>}
    */
 
-  async function indexDocuments({ db, name, fields }) {}
+  function indexDocuments({ db, name, fields }) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   /**
    * @param {ListDocumentArgs}
    * @returns {Promise<Response>}
    */
-  async function listDocuments(
+  function listDocuments(
     { db, limit, startkey, endkey, keys, descending },
-  ) {}
+  ) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   /**
    * @param {BulkDocumentsArgs}
    * @returns {Promise<Response>}
    */
-  async function bulkDocuments({ db, docs }) {}
+  function bulkDocuments({ db, docs }) {
+    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+  }
 
   return Object.freeze({
     createDatabase,
