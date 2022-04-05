@@ -4,7 +4,7 @@ import { handleHyperErr } from "./utils.js";
 
 const { Async } = crocks;
 
-const { always, omit, isEmpty } = R;
+const { always, omit, isEmpty, identity } = R;
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -124,7 +124,24 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function removeDocument({ db, id }) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    return metaDb.get(db)
+      .chain((db) =>
+        db.get(id)
+          .bimap(
+            (err) =>
+              err.status === 404
+                ? HyperErr({ status: 404, msg: "document not found" })
+                : err,
+            identity,
+          )
+          .chain((doc) => db.remove(doc))
+      )
+      .map(omit(["rev"])) // { ok, id }
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
   }
 
   /**

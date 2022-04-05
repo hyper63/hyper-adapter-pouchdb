@@ -92,4 +92,32 @@ Deno.test("should 409 if document with id already exists", async () => {
   await adapter.removeDatabase("foo");
 });
 
+Deno.test("should remove the document", async () => {
+  await adapter.createDatabase("foo");
+  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
+
+  await adapter.removeDocument({ db: "foo", id: "1234" })
+    .then((res) => assert(res.ok) && assert(res.id));
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
+Deno.test("should 404 if document does not exist", async () => {
+  await adapter.createDatabase("foo");
+
+  await adapter.removeDocument({
+    db: "foo",
+    id: "1234",
+  })
+    .catch((err) => err)
+    .then((res) => {
+      assert(!res.ok);
+      assertEquals(404, res.status);
+    });
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
 // Add more tests here for your adapter logic
