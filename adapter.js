@@ -4,7 +4,7 @@ import { handleHyperErr, lowerCaseValue, omitDesignDocs } from "./utils.js";
 
 const { Async } = crocks;
 
-const { always, omit, isEmpty, identity, map } = R;
+const { always, omit, isEmpty, identity, map, pluck, mergeRight } = R;
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -247,7 +247,30 @@ export default function ({ db: metaDb }) {
   function listDocuments(
     { db, limit, startkey, endkey, keys, descending },
   ) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    // deno-lint-ignore camelcase
+    let options = { include_docs: true };
+    options = limit ? mergeRight({ limit: Number(limit) }, options) : options;
+    options = startkey ? mergeRight({ startkey }, options) : options;
+    options = endkey ? mergeRight({ endkey }, options) : options;
+    options = keys ? mergeRight({ keys: keys.split(",") }, options) : options;
+    options = descending ? mergeRight({ descending }, options) : options;
+
+    return metaDb.get(db)
+      .chain((db) => db.allDocs(options))
+      .map((result) => pluck("doc", result.rows))
+      .map(omitDesignDocs)
+      .map((docs) => ({
+        ok: true,
+        docs: map(
+          omit(["_rev"]),
+          docs,
+        ),
+      }))
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
   }
 
   /**
