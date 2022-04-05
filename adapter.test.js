@@ -189,4 +189,55 @@ Deno.test("removeDocument - should 404 if document does not exist", async () => 
   await adapter.removeDatabase(db);
 });
 
+Deno.test("should query the documents", async () => {
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "5", doc: { val: 5 } });
+  await adapter.createDocument({ db, id: "6", doc: { val: 6 } });
+  await adapter.createDocument({ db, id: "2", doc: { val: 2 } });
+
+  await adapter.queryDocuments({
+    db,
+    query: {
+      selector: {
+        val: {
+          $gt: 4,
+        },
+      },
+      sort: [
+        { _id: "DESC" },
+      ],
+    },
+  })
+    .then((res) => {
+      assert(res.ok);
+      assertEquals(res.docs.length, 2);
+      assertEquals(res.docs[0].val, 6);
+      assertEquals(res.docs[1].val, 5);
+    });
+
+  // teardown
+  await adapter.removeDatabase(db);
+});
+
+Deno.test("should query with empty selector", async () => {
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "5", doc: { val: 5 } });
+  await adapter.createDocument({ db, id: "6", doc: { val: 6 } });
+  await adapter.createDocument({ db, id: "2", doc: { val: 2 } });
+
+  await adapter.queryDocuments({
+    db,
+    query: {},
+  })
+    .then((res) => {
+      assert(res.ok);
+      assertEquals(res.docs.length, 3);
+    });
+
+  // teardown
+  await adapter.removeDatabase(db);
+});
+
 // Add more tests here for your adapter logic

@@ -1,10 +1,10 @@
 import { crocks, HyperErr, R } from "./deps.js";
 
-import { handleHyperErr } from "./utils.js";
+import { handleHyperErr, lowerCaseValue, omitDesignDocs } from "./utils.js";
 
 const { Async } = crocks;
 
-const { always, omit, isEmpty, identity } = R;
+const { always, omit, isEmpty, identity, map } = R;
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -192,7 +192,29 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function queryDocuments({ db, query }) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    if (query.sort) {
+      query.sort = query.sort.map(lowerCaseValue);
+    }
+
+    if (!query.selector) {
+      query.selector = {};
+    }
+
+    return metaDb.get(db)
+      .chain((db) => db.find(query))
+      .map(omitDesignDocs)
+      .map(({ docs }) => ({
+        ok: true,
+        docs: map(
+          omit(["_rev"]),
+          docs,
+        ),
+      }))
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
   }
 
   /**
