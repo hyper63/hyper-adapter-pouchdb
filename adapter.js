@@ -223,7 +223,21 @@ export default function ({ db: metaDb }) {
    */
 
   function indexDocuments({ db, name, fields }) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    return metaDb.get(db)
+      .chain((db) =>
+        db.createIndex({
+          index: {
+            fields,
+            // TODO: check this. docs say put it here, but couch puts ddoc outside of index field
+            ddoc: name,
+          },
+        })
+      )
+      .bichain(
+        handleHyperErr,
+        always(Async.Resolved({ ok: true })),
+      )
+      .toPromise();
   }
 
   /**

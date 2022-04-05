@@ -240,4 +240,34 @@ Deno.test("should query with empty selector", async () => {
   await adapter.removeDatabase(db);
 });
 
+Deno.test("should create and name an index", async () => {
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "5", doc: { val: 5 } });
+
+  await adapter.indexDocuments({
+    db,
+    name: "val-index",
+    fields: ["val"],
+  })
+    .then((res) => {
+      assert(res.ok);
+    });
+
+  await adapter.queryDocuments({
+    db,
+    query: {
+      sort: [
+        { val: "ASC" },
+      ],
+      use_index: "val-index",
+    },
+  }).then((res) => {
+    assert(res.ok);
+  });
+
+  // teardown
+  await adapter.removeDatabase(db);
+});
+
 // Add more tests here for your adapter logic
