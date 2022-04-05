@@ -1,3 +1,4 @@
+import { bulk } from "./bulk.js";
 import { crocks, HyperErr, R } from "./deps.js";
 
 import { handleHyperErr, lowerCaseValue, omitDesignDocs } from "./utils.js";
@@ -278,7 +279,15 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function bulkDocuments({ db, docs }) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    return metaDb.get(db)
+      .map(bulk)
+      .chain((doBulk) => doBulk({ docs }))
+      .map((results) => ({ ok: true, results }))
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
   }
 
   return Object.freeze({
