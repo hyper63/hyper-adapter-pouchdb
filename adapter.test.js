@@ -297,4 +297,34 @@ Deno.test("should list documents", async () => {
   await adapter.removeDatabase(db);
 });
 
+Deno.test("should perform the bulk operation", async () => {
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "4", doc: { val: 4 } });
+  await adapter.createDocument({ db, id: "5", doc: { val: 5 } });
+
+  await adapter.bulkDocuments({
+    db,
+    docs: [
+      { _id: "6", val: 6 },
+      { _id: "5", val: 55 },
+      { _id: "4", _deleted: true },
+    ],
+  })
+    .then((res) => {
+      assert(res.ok);
+      assertEquals(res.results.length, 3);
+    });
+
+  await adapter.listDocuments({ db })
+    .then((res) => {
+      assertEquals(res.docs.length, 2);
+      assertEquals(res.docs[0].val, 55);
+      assertEquals(res.docs[1].val, 6);
+    });
+
+  // teardown
+  await adapter.removeDatabase(db);
+});
+
 // Add more tests here for your adapter logic
