@@ -108,7 +108,21 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function retrieveDocument({ db, id }) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    return metaDb.get(db)
+      .chain((db) => db.get(id))
+      .map(omit(["_rev"]))
+      .bichain(
+        (_) =>
+          Async.Rejected(
+            HyperErr({ status: 404, msg: "doc not found" }),
+          ),
+        Async.Resolved,
+      )
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
   }
 
   /**

@@ -92,6 +92,34 @@ Deno.test("should 409 if document with id already exists", async () => {
   await adapter.removeDatabase("foo");
 });
 
+Deno.test("should retrieve the document", async () => {
+  await adapter.createDatabase("foo");
+  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
+
+  await adapter.retrieveDocument({ db: "foo", id: "1234" })
+    .then((res) => assert(res._id) && assert(res.name));
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
+Deno.test("should 404 if document does not exist", async () => {
+  await adapter.createDatabase("foo");
+
+  await adapter.retrieveDocument({
+    db: "foo",
+    id: "not_found",
+  })
+    .catch((err) => err)
+    .then((res) => {
+      assert(!res.ok);
+      assertEquals(404, res.status);
+    });
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
 Deno.test("should remove the document", async () => {
   await adapter.createDatabase("foo");
   await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
