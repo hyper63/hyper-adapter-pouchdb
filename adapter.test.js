@@ -270,4 +270,31 @@ Deno.test("should create and name an index", async () => {
   await adapter.removeDatabase(db);
 });
 
+Deno.test("should list documents", async () => {
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "5", doc: { val: 5 } });
+  await adapter.createDocument({ db, id: "6", doc: { val: 6 } });
+  await adapter.createDocument({ db, id: "2", doc: { val: 2 } });
+  await adapter.createDocument({ db, id: "3", doc: { val: 3 } });
+  await adapter.createDocument({ db, id: "1", doc: { val: 1 } });
+
+  await adapter.listDocuments({
+    db,
+    startkey: "4",
+    endkey: "1",
+    limit: 2,
+    descending: true,
+  })
+    .then((res) => {
+      assert(res.ok);
+      assertEquals(res.docs.length, 2);
+      assertEquals(res.docs[0]._id, "3");
+      assertEquals(res.docs[1]._id, "2");
+    });
+
+  // teardown
+  await adapter.removeDatabase(db);
+});
+
 // Add more tests here for your adapter logic
