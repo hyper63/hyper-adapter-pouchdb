@@ -130,7 +130,36 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function updateDocument({ db, id, doc }) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    return metaDb.get(db)
+      .chain((db) =>
+        db.get(id)
+          .bichain(
+            (err) =>
+              err.status === 404 ? Async.Resolved(null) : Async.Rejected(err),
+            Async.Resolved,
+          )
+          .chain(
+            (old) =>
+              old
+                // update
+                ? db.put({
+                  ...doc,
+                  _id: id,
+                  _rev: old._rev,
+                })
+                : // create
+                  db.put({
+                    ...doc,
+                    _id: id,
+                  }),
+          )
+      )
+      .map(omit(["rev"])) // { ok, id }
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
   }
 
   /**

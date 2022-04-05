@@ -49,7 +49,7 @@ Deno.test("should 404 if database does not exists", async () => {
     });
 });
 
-Deno.test("should create the document", async () => {
+Deno.test("createDocument - should create the document", async () => {
   await adapter.createDatabase("foo");
 
   await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } })
@@ -103,7 +103,7 @@ Deno.test("should retrieve the document", async () => {
   await adapter.removeDatabase("foo");
 });
 
-Deno.test("should 404 if document does not exist", async () => {
+Deno.test("retrieveDocument - should 404 if document does not exist", async () => {
   await adapter.createDatabase("foo");
 
   await adapter.retrieveDocument({
@@ -120,6 +120,31 @@ Deno.test("should 404 if document does not exist", async () => {
   await adapter.removeDatabase("foo");
 });
 
+Deno.test("updateDocument - should create the document", async () => {
+  await adapter.createDatabase("foo");
+
+  await adapter.updateDocument({
+    db: "foo",
+    id: "new_id",
+    doc: { name: "bar" },
+  })
+    .then((res) => assert(res.id) && assert(res.ok));
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
+Deno.test("should update the document", async () => {
+  await adapter.createDatabase("foo");
+  await adapter.createDocument({ db: "foo", id: "new", doc: { name: "bar" } });
+
+  await adapter.updateDocument({ db: "foo", id: "new", doc: { name: "bar" } })
+    .then((res) => assert(res.id) && assert(res.ok));
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
 Deno.test("should remove the document", async () => {
   await adapter.createDatabase("foo");
   await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
@@ -131,7 +156,7 @@ Deno.test("should remove the document", async () => {
   await adapter.removeDatabase("foo");
 });
 
-Deno.test("should 404 if document does not exist", async () => {
+Deno.test("removeDocument - should 404 if document does not exist", async () => {
   await adapter.createDatabase("foo");
 
   await adapter.removeDocument({
