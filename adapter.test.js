@@ -7,22 +7,26 @@ const metaDb = MetaDb({ adapter: PouchDbAdapterTypes.memory });
 
 const adapter = adapterBuilder({ db: metaDb });
 
+const random = () => crypto.randomUUID();
+
 Deno.test("should implement the port", () => {
   assert(validateDataAdapterSchema(adapter));
 });
 
 Deno.test("should create the database", async () => {
-  await adapter.createDatabase("foo")
+  const db = random();
+  await adapter.createDatabase(db)
     .then((res) => assert(res.ok));
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("should 409 if database already exists", async () => {
-  await adapter.createDatabase("foo");
+  const db = random();
+  await adapter.createDatabase(db);
 
-  await adapter.createDatabase("foo")
+  await adapter.createDatabase(db)
     .catch((err) => err)
     .then((res) => {
       assert(!res.ok);
@@ -30,18 +34,21 @@ Deno.test("should 409 if database already exists", async () => {
     });
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("should remove the database", async () => {
-  await adapter.createDatabase("foo");
+  const db = random();
+  await adapter.createDatabase(db);
 
-  await adapter.removeDatabase("foo")
+  await adapter.removeDatabase(db)
     .then((res) => assert(res.ok));
 });
 
 Deno.test("should 404 if database does not exists", async () => {
-  await adapter.removeDatabase("foo")
+  const db = random();
+
+  await adapter.removeDatabase(db)
     .catch((err) => err)
     .then((res) => {
       assert(!res.ok);
@@ -50,19 +57,21 @@ Deno.test("should 404 if database does not exists", async () => {
 });
 
 Deno.test("createDocument - should create the document", async () => {
-  await adapter.createDatabase("foo");
+  const db = random();
+  await adapter.createDatabase(db);
 
-  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } })
+  await adapter.createDocument({ db, id: "1234", doc: { name: "bar" } })
     .then((res) => assert(res.ok) && assert(res.id));
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("should 400 if document is empty", async () => {
-  await adapter.createDatabase("foo");
+  const db = random();
+  await adapter.createDatabase(db);
 
-  await adapter.createDocument({ db: "foo", id: "1234", doc: {} })
+  await adapter.createDocument({ db, id: "1234", doc: {} })
     .catch((err) => err)
     .then((res) => {
       assert(!res.ok);
@@ -70,15 +79,16 @@ Deno.test("should 400 if document is empty", async () => {
     });
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("should 409 if document with id already exists", async () => {
-  await adapter.createDatabase("foo");
-  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "1234", doc: { name: "bar" } });
 
   await adapter.createDocument({
-    db: "foo",
+    db,
     id: "1234",
     doc: { name: "second bar" },
   })
@@ -89,25 +99,27 @@ Deno.test("should 409 if document with id already exists", async () => {
     });
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("should retrieve the document", async () => {
-  await adapter.createDatabase("foo");
-  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "1234", doc: { name: "bar" } });
 
-  await adapter.retrieveDocument({ db: "foo", id: "1234" })
+  await adapter.retrieveDocument({ db, id: "1234" })
     .then((res) => assert(res._id) && assert(res.name));
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("retrieveDocument - should 404 if document does not exist", async () => {
-  await adapter.createDatabase("foo");
+  const db = random();
+  await adapter.createDatabase(db);
 
   await adapter.retrieveDocument({
-    db: "foo",
+    db,
     id: "not_found",
   })
     .catch((err) => err)
@@ -117,50 +129,54 @@ Deno.test("retrieveDocument - should 404 if document does not exist", async () =
     });
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("updateDocument - should create the document", async () => {
-  await adapter.createDatabase("foo");
+  const db = random();
+  await adapter.createDatabase(db);
 
   await adapter.updateDocument({
-    db: "foo",
+    db,
     id: "new_id",
     doc: { name: "bar" },
   })
     .then((res) => assert(res.id) && assert(res.ok));
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("should update the document", async () => {
-  await adapter.createDatabase("foo");
-  await adapter.createDocument({ db: "foo", id: "new", doc: { name: "bar" } });
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "new", doc: { name: "bar" } });
 
-  await adapter.updateDocument({ db: "foo", id: "new", doc: { name: "bar" } })
+  await adapter.updateDocument({ db, id: "new", doc: { name: "bar" } })
     .then((res) => assert(res.id) && assert(res.ok));
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("should remove the document", async () => {
-  await adapter.createDatabase("foo");
-  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "1234", doc: { name: "bar" } });
 
-  await adapter.removeDocument({ db: "foo", id: "1234" })
+  await adapter.removeDocument({ db, id: "1234" })
     .then((res) => assert(res.ok) && assert(res.id));
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 Deno.test("removeDocument - should 404 if document does not exist", async () => {
-  await adapter.createDatabase("foo");
+  const db = random();
+  await adapter.createDatabase(db);
 
   await adapter.removeDocument({
-    db: "foo",
+    db,
     id: "1234",
   })
     .catch((err) => err)
@@ -170,7 +186,7 @@ Deno.test("removeDocument - should 404 if document does not exist", async () => 
     });
 
   // teardown
-  await adapter.removeDatabase("foo");
+  await adapter.removeDatabase(db);
 });
 
 // Add more tests here for your adapter logic
