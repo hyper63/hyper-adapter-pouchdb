@@ -82,7 +82,7 @@ export const MetaDb = ({ adapter, prefix }) => {
           .chain(asyncIs(isDefined))
           .bimap(
             () => HyperErr({ status: 404, msg: `database does not exist` }),
-            identity
+            identity,
           )
       )
       .map(asyncifyDb);

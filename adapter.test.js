@@ -1,11 +1,36 @@
-import { assert, validateDataAdapterSchema } from "./dev_deps.js";
+import { assert, assertEquals, validateDataAdapterSchema } from "./dev_deps.js";
 
 import adapterBuilder from "./adapter.js";
+import { MetaDb, PouchDbAdapterTypes } from "./meta.js";
 
-const adapter = adapterBuilder();
+const metaDb = MetaDb({ adapter: PouchDbAdapterTypes.memory });
+
+const adapter = adapterBuilder({ db: metaDb });
 
 Deno.test("should implement the port", () => {
   assert(validateDataAdapterSchema(adapter));
+});
+
+Deno.test("should create the database", async () => {
+  await adapter.createDatabase("foo")
+    .then((res) => assert(res.ok));
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
+Deno.test("should 409 if database already exists", async () => {
+  await adapter.createDatabase("foo");
+
+  await adapter.createDatabase("foo")
+    .catch((err) => err)
+    .then((res) => {
+      assert(!res.ok);
+      assertEquals(409, res.status);
+    });
+
+  // teardown
+  await adapter.removeDatabase("foo");
 });
 
 // Add more tests here for your adapter logic
