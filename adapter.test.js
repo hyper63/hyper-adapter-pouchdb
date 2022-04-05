@@ -33,4 +33,20 @@ Deno.test("should 409 if database already exists", async () => {
   await adapter.removeDatabase("foo");
 });
 
+Deno.test("should remove the database", async () => {
+  await adapter.createDatabase("foo");
+
+  await adapter.removeDatabase("foo")
+    .then((res) => assert(res.ok));
+});
+
+Deno.test("should 404 if database does not exists", async () => {
+  await adapter.removeDatabase("foo")
+    .catch((err) => err)
+    .then((res) => {
+      assert(!res.ok);
+      assertEquals(404, res.status);
+    });
+});
+
 // Add more tests here for your adapter logic
