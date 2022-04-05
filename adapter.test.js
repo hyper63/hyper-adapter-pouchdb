@@ -49,4 +49,47 @@ Deno.test("should 404 if database does not exists", async () => {
     });
 });
 
+Deno.test("should create the document", async () => {
+  await adapter.createDatabase("foo");
+
+  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } })
+    .then((res) => assert(res.ok) && assert(res.id));
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
+Deno.test("should 400 if document is empty", async () => {
+  await adapter.createDatabase("foo");
+
+  await adapter.createDocument({ db: "foo", id: "1234", doc: {} })
+    .catch((err) => err)
+    .then((res) => {
+      assert(!res.ok);
+      assertEquals(400, res.status);
+    });
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
+Deno.test("should 409 if document with id already exists", async () => {
+  await adapter.createDatabase("foo");
+  await adapter.createDocument({ db: "foo", id: "1234", doc: { name: "bar" } });
+
+  await adapter.createDocument({
+    db: "foo",
+    id: "1234",
+    doc: { name: "second bar" },
+  })
+    .catch((err) => err)
+    .then((res) => {
+      assert(!res.ok);
+      assertEquals(409, res.status);
+    });
+
+  // teardown
+  await adapter.removeDatabase("foo");
+});
+
 // Add more tests here for your adapter logic

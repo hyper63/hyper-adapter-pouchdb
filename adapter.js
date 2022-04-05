@@ -4,7 +4,7 @@ import { handleHyperErr } from "./utils.js";
 
 const { Async } = crocks;
 
-const { always } = R;
+const { always, omit, isEmpty } = R;
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -81,7 +81,26 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function createDocument({ db, id, doc }) {
-    return Promise.resolve(HyperErr({ status: 501, msg: "Not Implemented" }));
+    return Async.of(doc)
+      .chain((doc) =>
+        isEmpty(doc)
+          ? Async.Rejected(HyperErr({ status: 400, msg: "document empty" }))
+          : Async.Resolved(doc)
+      )
+      .chain(always(metaDb.get(db)))
+      .chain((db) => db.put({ ...doc, _id: id }))
+      .bimap(
+        (err) =>
+          err.status === 409
+            ? HyperErr({ status: 409, msg: "document conflict" })
+            : err,
+        omit(["rev"]),
+      )
+      .bichain(
+        handleHyperErr,
+        Async.Resolved,
+      )
+      .toPromise();
   }
 
   /**
