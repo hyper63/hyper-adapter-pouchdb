@@ -62,6 +62,8 @@ pouchdb({ storage: PouchDbAdapterTypes.memory });
 pouchdb({ storage: PouchDbAdapterTypes.idb });
 ```
 
+The default storage option is `idb`
+
 ## Installation
 
 This is a Deno module available to import from
