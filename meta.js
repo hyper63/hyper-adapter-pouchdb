@@ -25,6 +25,7 @@ const asyncifyDb = (db) => {
     close: Async.fromPromise(db.close.bind(db)),
     allDocs: Async.fromPromise(db.allDocs.bind(db)),
     bulkDocs: Async.fromPromise(db.bulkDocs.bind(db)),
+    getIndexes: Async.fromPromise(db.getIndexes.bind(db)),
   });
 };
 

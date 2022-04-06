@@ -189,6 +189,10 @@ export default function ({ db: metaDb }) {
   }
 
   /**
+   * TODO: there seems some differences between Pouch And Couch
+   * on how indexes are handled. See https://github.com/pouchdb/pouchdb/issues/8385
+   * Because of this, the sort query test in hyper-test is not passing
+   *
    * @param {QueryDocumentsArgs}
    * @returns {Promise<Response>}
    */
@@ -222,16 +226,18 @@ export default function ({ db: metaDb }) {
    * @param {IndexDocumentArgs}
    * @returns {Promise<Response>}
    */
-
   function indexDocuments({ db, name, fields }) {
     return metaDb.get(db)
       .chain((db) =>
         db.createIndex({
           index: {
             fields,
+            name,
             // TODO: check this. docs say put it here, but couch puts ddoc outside of index field
             ddoc: name,
           },
+          name,
+          ddoc: name,
         })
       )
       .bichain(
