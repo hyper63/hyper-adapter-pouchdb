@@ -46,7 +46,7 @@ const mergeWithRevs = (docs) =>
       /**
        * If a rev exists, then update doc,
        * Otherwise, create a doc with no _rev
-       * and Couch will create a new doc with a new rev
+       * and Pouch will create a new doc with a new rev
        */
       return rev ? { _rev: rev.rev, ...doc } : doc;
     }, docs);
