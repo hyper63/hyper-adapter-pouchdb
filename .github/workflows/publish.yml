@@ -1,0 +1,20 @@
+name: Publish
+
+on: 
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish-egg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - run: deno install -A -f --unstable --no-check https://x.nest.land/eggs@0.3.10/eggs.ts
+      - run: |
+          export PATH="/home/runner/.deno/bin:$PATH"
+          eggs link ${{ secrets.NESTAPIKEY }}
+          eggs publish --yes
