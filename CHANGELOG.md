@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.0...v0.1.1) (2022-04-21)
+
+
+### Features
+
+* allow passing dir in options [#26](https://github.com/hyper63/hyper-adapter-pouchdb/issues/26) ([0f70396](https://github.com/hyper63/hyper-adapter-pouchdb/commit/0f703962115129cfb354fa3ecebe4e6edcc91491))
+
 ## 0.1.0 (2022-04-06)
 
 
