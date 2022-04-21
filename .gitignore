@@ -1,3 +1,2 @@
+**/*.sqlite
 temp.js
-*.sqlite
-*.sqlite-journal

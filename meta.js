@@ -5,14 +5,22 @@ import { asyncIs, isDefined, isNotEqual } from "./utils.js";
 const { Async } = crocks;
 const { identity, tap, map } = R;
 
-const metaDbName = "cl1ld3td500003e68rc2f8o6x";
+const metaDbName = "meta-cl1ld3td500003e68rc2f8o6x";
 
 export const PouchDbAdapterTypes = {
   idb: "idb",
   memory: "memory",
 };
 
-const createPouch = (name, options) => new PouchDB.defaults(options)(name);
+export const createPouch = (name, options) => {
+  const _options = { ...options };
+  // always end with trailing slash (see prefix in https://github.com/aaronhuggins/pouchdb_deno#indexeddb)
+  if (_options.prefix && _options.prefix.slice(-1) !== "/") {
+    _options.prefix = `${_options.prefix}/`;
+  }
+
+  return new PouchDB.defaults(_options)(name);
+};
 
 const asyncifyDb = (db) => {
   return ({
@@ -30,7 +38,9 @@ const asyncifyDb = (db) => {
 };
 
 export const MetaDb = ({ adapter, prefix }) => {
-  const metaDb = asyncifyDb(createPouch(metaDbName, { adapter, prefix }));
+  const metaDb = asyncifyDb(
+    createPouch(metaDbName, { adapter, prefix, systemPath: prefix }),
+  );
   const dbs = new Map();
   let loaded = false;
 
@@ -51,7 +61,6 @@ export const MetaDb = ({ adapter, prefix }) => {
       selector: { type: "database" },
       limit: Number.MAX_SAFE_INTEGER,
     }).map((res) => res.docs)
-      .map(tap(console.log))
       .map(map(
         ({ name }) => {
           dbs.set(name, createPouch(name, { adapter, prefix }));

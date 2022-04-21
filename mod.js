@@ -5,9 +5,14 @@ import { MetaDb, PouchDbAdapterTypes } from "./meta.js";
 
 export { PouchDbAdapterTypes };
 
-export default ({ storage } = {}) => ({
+export default ({ storage, dir } = {}) => ({
   id: "pouchdb",
   port: PORT_NAME,
-  load: () => ({ db: MetaDb({ adapter: storage || PouchDbAdapterTypes.idb }) }), // load env
+  load: () => ({
+    db: MetaDb({
+      adapter: storage || PouchDbAdapterTypes.idb,
+      prefix: dir,
+    }),
+  }), // load env
   link: (env) => (_) => adapter(env), // link adapter
 });
