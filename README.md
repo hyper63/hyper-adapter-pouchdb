@@ -64,6 +64,19 @@ pouchdb({ storage: PouchDbAdapterTypes.idb });
 
 The default storage option is `idb`
 
+### Storage Directory
+
+When using the `idb` (IndexedDB polyfill), you can specify where `.sqlite` files
+used by `indexeddb` are placed by providing a `dir` option:
+
+```js
+import { default as pouchdb } from "https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js";
+
+pouchdb({ dir: "/tmp" });
+```
+
+The default directory is the `cwd`
+
 ## Installation
 
 This is a Deno module available to import from
