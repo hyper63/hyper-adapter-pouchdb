@@ -9,6 +9,7 @@ const metaDbName = "meta-cl1ld3td500003e68rc2f8o6x";
 
 export const PouchDbAdapterTypes = {
   idb: "idb",
+  indexeddb: "indexeddb",
   memory: "memory",
 };
 

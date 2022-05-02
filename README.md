@@ -47,9 +47,11 @@ export default {
 
 ### Storage Options
 
-This adapter can use either `memory` or `idb` (IndexedDB polyfill) for `PouchDB`
-storage. You may choose which storage to use by passing the `storage` option to
-the adapter:
+This adapter can use either `memory`, `idb` (IndexedDB polyfill), or `indexeddb`
+(IndexedDB BETA. See
+[distinction here](https://pouchdb.com/2020/02/12/pouchdb-7.2.0.html)) for
+`PouchDB` storage. You may choose which storage to use by passing the `storage`
+option to the adapter:
 
 ```js
 import {
