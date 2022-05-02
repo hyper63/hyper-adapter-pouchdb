@@ -197,12 +197,36 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function queryDocuments({ db, query }) {
-    if (query.sort) {
-      query.sort = query.sort.map(lowerCaseValue);
-    }
-
     if (!query.selector) {
       query.selector = {};
+    }
+
+    if (query.sort) {
+      query.sort = query.sort.map(lowerCaseValue);
+      /**
+       * TODO: remove when index querying issue is solved in PouchDB
+       *
+       * This is a hack to get indexes to work similarly across Pouch and Couch
+       * See https://github.com/pouchdb/pouchdb/issues/8385
+       *
+       * Ensure each sort key is present in the selector, if not already in the selector,
+       * by adding a check that the sort key exists on the document,
+       * This should get around the index querying discrepancy between Pouch and Couch,
+       * because fields must exist to be used for sort anyway.
+       */
+      query.selector = query.sort
+        .map((o) => Object.keys(o).pop())
+        .reduce(
+          (selector, sortKey) => ({
+            [sortKey]: { $exists: true },
+            /**
+             * Will overwrite [sortKey] if it was already present on the selector,
+             * making this reduce iter a noop
+             */
+            ...selector,
+          }),
+          query.selector,
+        );
     }
 
     return metaDb.get(db)
