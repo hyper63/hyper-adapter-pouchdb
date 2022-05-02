@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.2](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.1...v0.1.2) (2022-05-02)
+
+
+### Bug Fixes
+
+* **removeDatabase:** database is actually destroyed [#28](https://github.com/hyper63/hyper-adapter-pouchdb/issues/28) ([1bf89ec](https://github.com/hyper63/hyper-adapter-pouchdb/commit/1bf89ec5d7ec638c929c3017b6900d6b0105fa9c))
+
 ### [0.1.1](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.0...v0.1.1) (2022-04-21)
 
 
