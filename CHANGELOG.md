@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.4](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.3...v0.1.4) (2022-05-02)
+
+
+### Bug Fixes
+
+* add shim to add all sort keys to selector [#25](https://github.com/hyper63/hyper-adapter-pouchdb/issues/25) ([ea462c0](https://github.com/hyper63/hyper-adapter-pouchdb/commit/ea462c000870ccd41f73a76e25d083a1d02ce79d))
+
 ### [0.1.3](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.2...v0.1.3) (2022-05-02)
 
 
