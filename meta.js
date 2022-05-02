@@ -31,6 +31,7 @@ const asyncifyDb = (db) => {
     remove: Async.fromPromise(db.remove.bind(db)),
     createIndex: Async.fromPromise(db.createIndex.bind(db)),
     close: Async.fromPromise(db.close.bind(db)),
+    destroy: Async.fromPromise(db.destroy.bind(db)),
     allDocs: Async.fromPromise(db.allDocs.bind(db)),
     bulkDocs: Async.fromPromise(db.bulkDocs.bind(db)),
     getIndexes: Async.fromPromise(db.getIndexes.bind(db)),
@@ -43,10 +44,6 @@ export const MetaDb = ({ adapter, prefix }) => {
   );
   const dbs = new Map();
   let loaded = false;
-
-  const _close = (name) => {
-    return get(name).chain((db) => db.close());
-  };
 
   /**
    * Open connections to each persisted database
@@ -134,9 +131,9 @@ export const MetaDb = ({ adapter, prefix }) => {
           .chain(asyncIs(isDefined))
           // remove tracking doc from metaDb
           .chain((doc) => metaDb.remove(doc))
+          // destroy the underlying storage, and remove from dbs Map
           .chain(() =>
-            // Close the connection to underlying storage, and remove from dbs Map
-            _close(name)
+            get(name).chain((db) => db.destroy())
               .map(() => dbs.delete(name))
           )
       )
@@ -144,8 +141,9 @@ export const MetaDb = ({ adapter, prefix }) => {
   };
 
   const down = () => {
+    // Close all connections to databases
     return Async.all(
-      Array.from(dbs.keys).map(_close),
+      Array.from(dbs.keys).map((name) => get(name).chain((db) => db.close())),
     ).chain(() => metaDb.close());
   };
 

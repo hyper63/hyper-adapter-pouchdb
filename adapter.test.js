@@ -45,6 +45,24 @@ Deno.test("should remove the database", async () => {
     .then((res) => assert(res.ok));
 });
 
+Deno.test("should be empty if removed and recreated", async () => {
+  const db = random();
+  await adapter.createDatabase(db);
+  await adapter.createDocument({ db, id: "foobar", doc: { foo: "bar" } });
+
+  await adapter.removeDatabase(db)
+    .then((res) => assert(res.ok));
+
+  await adapter.createDatabase(db);
+  await adapter.retrieveDocument({ db, id: "foobar" })
+    .then((res) =>
+      assertEquals(res, { ok: false, status: 404, msg: "doc not found" })
+    );
+
+  // teardown
+  await adapter.removeDatabase(db);
+});
+
 Deno.test("should 404 if database does not exists", async () => {
   const db = random();
 
