@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.2...v0.1.3) (2022-05-02)
+
+
+### Features
+
+* **indexeddb:** add indexeddb storage option [#25](https://github.com/hyper63/hyper-adapter-pouchdb/issues/25) ([b243985](https://github.com/hyper63/hyper-adapter-pouchdb/commit/b243985047f0658f3af3a84c64c5af0856362f3c))
+
 ### [0.1.2](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.1...v0.1.2) (2022-05-02)
 
 
