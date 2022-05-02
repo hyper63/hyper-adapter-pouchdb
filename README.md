@@ -9,17 +9,6 @@
 
 ---
 
-There are some differences between `PouchDB` And `CouchDB` on how indexes are
-handled. See this
-[open issue on PouchDB](https://github.com/pouchdb/pouchdb/issues/8385):
-
-> With PouchDB, it is expected that all the indexed fields exist in the
-> `selector`, otherwise an error is returned. With CouchDB, it is expected that
-> all the indexed fields exist in the `selector` OR in the `sort`.
-
-Take this into consideration when using this adapter. An issue is open to track
-this [here](https://github.com/hyper63/hyper-adapter-pouchdb/issues/25)
-
 ## Table of Contents
 
 - [Getting Started](#getting-started)
