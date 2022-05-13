@@ -1,11 +1,11 @@
 import { bulk } from "./bulk.js";
 import { crocks, HyperErr, R } from "./deps.js";
 
-import { handleHyperErr, lowerCaseValue, omitDesignDocs } from "./utils.js";
+import { foldDocs, handleHyperErr, lowerCaseValue } from "./utils.js";
 
 const { Async } = crocks;
 
-const { always, omit, isEmpty, identity, map, pluck, mergeRight } = R;
+const { always, omit, isEmpty, identity, pluck, mergeRight, prop } = R;
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -231,14 +231,9 @@ export default function ({ db: metaDb }) {
 
     return metaDb.get(db)
       .chain((db) => db.find(query))
-      .map(omitDesignDocs)
-      .map(({ docs }) => ({
-        ok: true,
-        docs: map(
-          omit(["_rev"]),
-          docs,
-        ),
-      }))
+      .map(prop("docs"))
+      .map(foldDocs)
+      .map((docs) => ({ ok: true, docs }))
       .bichain(
         handleHyperErr,
         Async.Resolved,
@@ -288,15 +283,10 @@ export default function ({ db: metaDb }) {
 
     return metaDb.get(db)
       .chain((db) => db.allDocs(options))
-      .map((result) => pluck("doc", result.rows))
-      .map(omitDesignDocs)
-      .map((docs) => ({
-        ok: true,
-        docs: map(
-          omit(["_rev"]),
-          docs,
-        ),
-      }))
+      .map(prop("rows"))
+      .map(pluck("doc"))
+      .map(foldDocs)
+      .map((docs) => ({ ok: true, docs }))
       .bichain(
         handleHyperErr,
         Async.Resolved,

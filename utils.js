@@ -11,8 +11,11 @@ const {
   head,
   toPairs,
   compose,
-  filter,
+  reduce,
   equals,
+  allPass,
+  omit,
+  always,
 } = R;
 
 export const isDefined = complement(isNil);
@@ -24,9 +27,24 @@ export const lowerCaseValue = compose(
   toPairs,
 );
 
-export const omitDesignDocs = filter(
-  (doc) => !(/^_design/.test(doc._id)),
-);
+export const foldDocs = (all) =>
+  reduce(
+    (docs, doc) => {
+      return ifElse(
+        allPass([
+          isDefined, // must be defined
+          (doc) => !(/^_design/.test(doc._id)), // filter out all design docs
+        ]),
+        (doc) => {
+          docs.push(omit(["_rev"], doc));
+          return docs;
+        },
+        always(docs),
+      )(doc);
+    },
+    [],
+    all,
+  );
 
 const is = (pred) => (value) => (pred(value) ? Right(value) : Left(value));
 
