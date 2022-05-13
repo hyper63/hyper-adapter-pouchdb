@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.4...v0.1.5) (2022-05-13)
+
+
+### Bug Fixes
+
+* **listDocuments,queryDocuments:** fold over docs, filtering out bad values ([5e2aa1e](https://github.com/hyper63/hyper-adapter-pouchdb/commit/5e2aa1e61695b648a281191b0025bb391210670b))
+
 ### [0.1.4](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.3...v0.1.4) (2022-05-02)
 
 
