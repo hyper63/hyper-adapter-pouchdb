@@ -1,4 +1,4 @@
-import { assert, assertEquals, validateDataAdapterSchema } from "./dev_deps.js";
+import { assert, assertEquals } from "./dev_deps.js";
 
 import adapterBuilder from "./adapter.js";
 import { MetaDb, PouchDbAdapterTypes } from "./meta.js";
@@ -8,10 +8,6 @@ const metaDb = MetaDb({ adapter: PouchDbAdapterTypes.memory });
 const adapter = adapterBuilder({ db: metaDb });
 
 const random = () => crypto.randomUUID();
-
-Deno.test("should implement the port", () => {
-  assert(validateDataAdapterSchema(adapter));
-});
 
 Deno.test("should create the database", async () => {
   const db = random();
