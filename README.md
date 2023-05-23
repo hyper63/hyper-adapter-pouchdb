@@ -24,46 +24,44 @@
 `hyper.config.js`
 
 ```js
-import { default as pouchdb } from "https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js";
+import { default as pouchdb } from 'https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js'
 
 export default {
   app: opine,
   adapter: [
-    { port: "data", plugins: [pouchdb()] },
+    { port: 'data', plugins: [pouchdb()] },
   ],
-};
+}
 ```
 
 ### Storage Options
 
-This adapter can use either `memory`, `idb` (IndexedDB polyfill), or `indexeddb`
-(IndexedDB BETA. See
-[distinction here](https://pouchdb.com/2020/02/12/pouchdb-7.2.0.html)) for
-`PouchDB` storage. You may choose which storage to use by passing the `storage`
-option to the adapter:
+This adapter can use either `memory`, `idb` (IndexedDB polyfill), or `indexeddb` (IndexedDB BETA.
+See [distinction here](https://pouchdb.com/2020/02/12/pouchdb-7.2.0.html)) for `PouchDB` storage.
+You may choose which storage to use by passing the `storage` option to the adapter:
 
 ```js
 import {
   default as pouchdb,
   PouchDbAdapterTypes,
-} from "https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js";
+} from 'https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js'
 
-pouchdb({ storage: PouchDbAdapterTypes.memory });
+pouchdb({ storage: PouchDbAdapterTypes.memory })
 // OR use IndexedDB for persistence
-pouchdb({ storage: PouchDbAdapterTypes.idb });
+pouchdb({ storage: PouchDbAdapterTypes.idb })
 ```
 
 The default storage option is `idb`
 
 ### Storage Directory
 
-When using the `idb` (IndexedDB polyfill), you can specify where `.sqlite` files
-used by `indexeddb` are placed by providing a `dir` option:
+When using the `idb` (IndexedDB polyfill), you can specify where `.sqlite` files used by `indexeddb`
+are placed by providing a `dir` option:
 
 ```js
-import { default as pouchdb } from "https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js";
+import { default as pouchdb } from 'https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js'
 
-pouchdb({ dir: "/tmp" });
+pouchdb({ dir: '/tmp' })
 ```
 
 The default directory is the `cwd`
@@ -76,7 +74,7 @@ This is a Deno module available to import from
 deps.js
 
 ```js
-export { default as pouchdb } from "https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js";
+export { default as pouchdb } from 'https://x.nest.land/hyper-adapter-pouchdb@VERSION/mod.js'
 ```
 
 ## Features

@@ -1,7 +1,9 @@
 {
   "fmt": {
-    "files": {
-      "exclude": ["CHANGELOG.md"]
-    }
+    "include": ["./"],
+    "exclude": ["CHANGELOG.md"],
+    "lineWidth": 100,
+    "singleQuote": true,
+    "semiColons": false
   }
 }

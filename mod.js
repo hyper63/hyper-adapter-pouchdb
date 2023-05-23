@@ -1,12 +1,12 @@
-import adapter from "./adapter.js";
-import PORT_NAME from "./port_name.js";
+import adapter from './adapter.js'
+import PORT_NAME from './port_name.js'
 
-import { MetaDb, PouchDbAdapterTypes } from "./meta.js";
+import { MetaDb, PouchDbAdapterTypes } from './meta.js'
 
-export { PouchDbAdapterTypes };
+export { PouchDbAdapterTypes }
 
 export default ({ storage, dir } = {}) => ({
-  id: "pouchdb",
+  id: 'pouchdb',
   port: PORT_NAME,
   load: () => ({
     db: MetaDb({
@@ -15,4 +15,4 @@ export default ({ storage, dir } = {}) => ({
     }),
   }), // load env
   link: (env) => (_) => adapter(env), // link adapter
-});
+})
