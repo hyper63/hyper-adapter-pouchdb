@@ -1,6 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [0.1.7](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.6...v0.1.7) (2023-05-23)
 
 ### [0.1.6](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.5...v0.1.6) (2022-09-02)
 
