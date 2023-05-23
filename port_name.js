@@ -1,4 +1,4 @@
 /**
  * @type {"cache" | "storage" | "data" | "search" | "hooks" | "queue"}
  */
-export default "data";
+export default 'data'

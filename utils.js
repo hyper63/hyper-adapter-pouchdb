@@ -1,7 +1,7 @@
-import { crocks, isHyperErr, R } from "./deps.js";
+import { crocks, isHyperErr, R } from './deps.js'
 
-const { Async, Either, eitherToAsync } = crocks;
-const { Left, Right } = Either;
+const { Async, Either, eitherToAsync } = crocks
+const { Left, Right } = Either
 
 const {
   ifElse,
@@ -16,16 +16,16 @@ const {
   allPass,
   omit,
   always,
-} = R;
+} = R
 
-export const isDefined = complement(isNil);
-export const isNotEqual = complement(equals);
+export const isDefined = complement(isNil)
+export const isNotEqual = complement(equals)
 
 export const lowerCaseValue = compose(
   ([k, v]) => ({ [k]: toLower(v) }),
   head,
   toPairs,
-);
+)
 
 export const foldDocs = (all) =>
   reduce(
@@ -36,22 +36,22 @@ export const foldDocs = (all) =>
           (doc) => !(/^_design/.test(doc._id)), // filter out all design docs
         ]),
         (doc) => {
-          docs.push(omit(["_rev"], doc));
-          return docs;
+          docs.push(omit(['_rev'], doc))
+          return docs
         },
         always(docs),
-      )(doc);
+      )(doc)
     },
     [],
     all,
-  );
+  )
 
-const is = (pred) => (value) => (pred(value) ? Right(value) : Left(value));
+const is = (pred) => (value) => (pred(value) ? Right(value) : Left(value))
 
-export const asyncIs = compose(eitherToAsync, is);
+export const asyncIs = compose(eitherToAsync, is)
 
 export const handleHyperErr = ifElse(
   isHyperErr,
   Async.Resolved,
   Async.Rejected,
-);
+)

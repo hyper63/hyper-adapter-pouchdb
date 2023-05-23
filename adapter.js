@@ -1,11 +1,11 @@
-import { bulk } from "./bulk.js";
-import { crocks, HyperErr, R } from "./deps.js";
+import { bulk } from './bulk.js'
+import { crocks, HyperErr, R } from './deps.js'
 
-import { foldDocs, handleHyperErr, lowerCaseValue } from "./utils.js";
+import { foldDocs, handleHyperErr, lowerCaseValue } from './utils.js'
 
-const { Async } = crocks;
+const { Async } = crocks
 
-const { always, omit, isEmpty, identity, pluck, mergeRight, prop } = R;
+const { always, omit, isEmpty, identity, pluck, mergeRight, prop } = R
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -60,7 +60,7 @@ export default function ({ db: metaDb }) {
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -74,7 +74,7 @@ export default function ({ db: metaDb }) {
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -85,23 +85,20 @@ export default function ({ db: metaDb }) {
     return Async.of(doc)
       .chain((doc) =>
         isEmpty(doc)
-          ? Async.Rejected(HyperErr({ status: 400, msg: "document empty" }))
+          ? Async.Rejected(HyperErr({ status: 400, msg: 'document empty' }))
           : Async.Resolved(doc)
       )
       .chain(always(metaDb.get(db)))
       .chain((db) => db.put({ ...doc, _id: id }))
       .bimap(
-        (err) =>
-          err.status === 409
-            ? HyperErr({ status: 409, msg: "document conflict" })
-            : err,
-        omit(["rev"]),
+        (err) => err.status === 409 ? HyperErr({ status: 409, msg: 'document conflict' }) : err,
+        omit(['rev']),
       )
       .bichain(
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -111,11 +108,11 @@ export default function ({ db: metaDb }) {
   function retrieveDocument({ db, id }) {
     return metaDb.get(db)
       .chain((db) => db.get(id))
-      .map(omit(["_rev"]))
+      .map(omit(['_rev']))
       .bichain(
         (_) =>
           Async.Rejected(
-            HyperErr({ status: 404, msg: "doc not found" }),
+            HyperErr({ status: 404, msg: 'doc not found' }),
           ),
         Async.Resolved,
       )
@@ -123,7 +120,7 @@ export default function ({ db: metaDb }) {
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -135,8 +132,7 @@ export default function ({ db: metaDb }) {
       .chain((db) =>
         db.get(id)
           .bichain(
-            (err) =>
-              err.status === 404 ? Async.Resolved(null) : Async.Rejected(err),
+            (err) => err.status === 404 ? Async.Resolved(null) : Async.Rejected(err),
             Async.Resolved,
           )
           .chain(
@@ -148,19 +144,19 @@ export default function ({ db: metaDb }) {
                   _id: id,
                   _rev: old._rev,
                 })
-                : // create
-                  db.put({
-                    ...doc,
-                    _id: id,
-                  }),
+                // create
+                : db.put({
+                  ...doc,
+                  _id: id,
+                }),
           )
       )
-      .map(omit(["rev"])) // { ok, id }
+      .map(omit(['rev'])) // { ok, id }
       .bichain(
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -173,19 +169,17 @@ export default function ({ db: metaDb }) {
         db.get(id)
           .bimap(
             (err) =>
-              err.status === 404
-                ? HyperErr({ status: 404, msg: "document not found" })
-                : err,
+              err.status === 404 ? HyperErr({ status: 404, msg: 'document not found' }) : err,
             identity,
           )
           .chain((doc) => db.remove(doc))
       )
-      .map(omit(["rev"])) // { ok, id }
+      .map(omit(['rev'])) // { ok, id }
       .bichain(
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -198,11 +192,11 @@ export default function ({ db: metaDb }) {
    */
   function queryDocuments({ db, query }) {
     if (!query.selector) {
-      query.selector = {};
+      query.selector = {}
     }
 
     if (query.sort) {
-      query.sort = query.sort.map(lowerCaseValue);
+      query.sort = query.sort.map(lowerCaseValue)
       /**
        * TODO: remove when index querying issue is solved in PouchDB
        *
@@ -226,19 +220,19 @@ export default function ({ db: metaDb }) {
             ...selector,
           }),
           query.selector,
-        );
+        )
     }
 
     return metaDb.get(db)
       .chain((db) => db.find(query))
-      .map(prop("docs"))
+      .map(prop('docs'))
       .map(foldDocs)
       .map((docs) => ({ ok: true, docs }))
       .bichain(
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -263,7 +257,7 @@ export default function ({ db: metaDb }) {
         handleHyperErr,
         always(Async.Resolved({ ok: true })),
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -274,24 +268,24 @@ export default function ({ db: metaDb }) {
     { db, limit, startkey, endkey, keys, descending },
   ) {
     // deno-lint-ignore camelcase
-    let options = { include_docs: true };
-    options = limit ? mergeRight({ limit: Number(limit) }, options) : options;
-    options = startkey ? mergeRight({ startkey }, options) : options;
-    options = endkey ? mergeRight({ endkey }, options) : options;
-    options = keys ? mergeRight({ keys: keys.split(",") }, options) : options;
-    options = descending ? mergeRight({ descending }, options) : options;
+    let options = { include_docs: true }
+    options = limit ? mergeRight({ limit: Number(limit) }, options) : options
+    options = startkey ? mergeRight({ startkey }, options) : options
+    options = endkey ? mergeRight({ endkey }, options) : options
+    options = keys ? mergeRight({ keys: keys.split(',') }, options) : options
+    options = descending ? mergeRight({ descending }, options) : options
 
     return metaDb.get(db)
       .chain((db) => db.allDocs(options))
-      .map(prop("rows"))
-      .map(pluck("doc"))
+      .map(prop('rows'))
+      .map(pluck('doc'))
       .map(foldDocs)
       .map((docs) => ({ ok: true, docs }))
       .bichain(
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   /**
@@ -307,7 +301,7 @@ export default function ({ db: metaDb }) {
         handleHyperErr,
         Async.Resolved,
       )
-      .toPromise();
+      .toPromise()
   }
 
   return Object.freeze({
@@ -321,5 +315,5 @@ export default function ({ db: metaDb }) {
     indexDocuments,
     listDocuments,
     bulkDocuments,
-  });
+  })
 }
