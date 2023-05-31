@@ -1,11 +1,11 @@
-import { default as appOpine } from 'https://x.nest.land/hyper-app-opine@2.1.0/mod.js'
-import { default as core } from 'https://x.nest.land/hyper@3.2.2/mod.js'
+import { default as hyper } from 'https://raw.githubusercontent.com/hyper63/hyper/hyper%40v4.1.0/packages/core/mod.ts'
+import { default as app } from 'https://raw.githubusercontent.com/hyper63/hyper/hyper-app-express%40v1.1.0/packages/app-express/mod.ts'
 
 import myAdapter from '../mod.js'
 import PORT_NAME from '../port_name.js'
 
 const hyperConfig = {
-  app: appOpine,
+  app,
   adapters: [
     {
       port: PORT_NAME,
@@ -14,4 +14,4 @@ const hyperConfig = {
   ],
 }
 
-core(hyperConfig)
+hyper(hyperConfig)
