@@ -1,11 +1,11 @@
 import { bulk } from './bulk.js'
 import { crocks, HyperErr, R } from './deps.js'
 
-import { foldDocs, handleHyperErr, lowerCaseValue } from './utils.js'
+import { handleHyperErr, lowerCaseValue, sanitizeDocs, sanitizeRows } from './utils.js'
 
 const { Async } = crocks
 
-const { always, omit, isEmpty, identity, pluck, mergeRight, prop } = R
+const { always, omit, isEmpty, identity, mergeRight, prop } = R
 
 /**
  * @typedef {Object} CreateDocumentArgs
@@ -226,7 +226,7 @@ export default function ({ db: metaDb }) {
     return metaDb.get(db)
       .chain((db) => db.find(query))
       .map(prop('docs'))
-      .map(foldDocs)
+      .map(sanitizeDocs)
       .map((docs) => ({ ok: true, docs }))
       .bichain(
         handleHyperErr,
@@ -278,8 +278,7 @@ export default function ({ db: metaDb }) {
     return metaDb.get(db)
       .chain((db) => db.allDocs(options))
       .map(prop('rows'))
-      .map(pluck('doc'))
-      .map(foldDocs)
+      .map(sanitizeRows)
       .map((docs) => ({ ok: true, docs }))
       .bichain(
         handleHyperErr,
