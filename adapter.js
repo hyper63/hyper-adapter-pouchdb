@@ -1,7 +1,7 @@
 import { bulk } from './bulk.js'
 import { crocks, HyperErr, R } from './deps.js'
 
-import { handleHyperErr, lowerCaseValue, sanitizeDocs, sanitizeRows } from './utils.js'
+import { handleHyperErr, mapSelector, mapSort, sanitizeDocs, sanitizeRows } from './utils.js'
 
 const { Async } = crocks
 
@@ -22,11 +22,11 @@ const { always, omit, isEmpty, identity, mergeRight, prop } = R
  * @property {QueryArgs} query
  *
  * @typedef {Object} QueryArgs
- * @property {object} selector
- * @property {string[]} fields
- * @property {number} limit
- * @property {object[]} sort
- * @property {string} use_index
+ * @property {object} [selector]
+ * @property {string[]} [fields]
+ * @property {number} [limit]
+ * @property {string[] | { [field: string]: 'ASC' | 'DESC'}[]} [sort]
+ * @property {string} [use_index]
  *
  * @typedef {Object} IndexDocumentArgs
  * @property {string} db
@@ -35,10 +35,10 @@ const { always, omit, isEmpty, identity, mergeRight, prop } = R
  *
  * @typedef {Object} ListDocumentArgs
  * @property {string} db
- * @property {number} limit
- * @property {string} startkey
- * @property {string} endkey
- * @property {string[]} keys
+ * @property {number} [limit]
+ * @property {string} [startkey]
+ * @property {string} [endkey]
+ * @property {string[]} [keys]
  *
  * @typedef {Object} BulkDocumentsArgs
  * @property {string} db
@@ -191,12 +191,10 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function queryDocuments({ db, query }) {
-    if (!query.selector) {
-      query.selector = {}
-    }
+    query.selector = mapSelector(query.selector)
+    query.sort = mapSort(query.sort)
 
     if (query.sort) {
-      query.sort = query.sort.map(lowerCaseValue)
       /**
        * TODO: remove when index querying issue is solved in PouchDB
        *
@@ -209,7 +207,10 @@ export default function ({ db: metaDb }) {
        * because fields must exist to be used for sort anyway.
        */
       query.selector = query.sort
-        .map((o) => Object.keys(o).pop())
+        .map((v) => {
+          if (typeof v === 'string') return v
+          return Object.keys(v).at(0)
+        })
         .reduce(
           (selector, sortKey) => ({
             [sortKey]: { $exists: true },
@@ -222,6 +223,8 @@ export default function ({ db: metaDb }) {
           query.selector,
         )
     }
+
+    console.log(query.selector)
 
     return metaDb.get(db)
       .chain((db) => db.find(query))

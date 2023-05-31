@@ -19,15 +19,14 @@ const {
   pluck,
   map,
   filter,
+  is: rIs,
+  cond,
+  defaultTo,
+  identity,
+  T,
 } = R
 
 export const isNotEqual = complement(equals)
-
-export const lowerCaseValue = compose(
-  ([k, v]) => ({ [k]: toLower(v) }),
-  head,
-  toPairs,
-)
 
 export const isDefined = complement(isNil)
 
@@ -85,3 +84,35 @@ export const handleHyperErr = ifElse(
   Async.Resolved,
   Async.Rejected,
 )
+
+/**
+ * Given an array of hyper sort criteria,
+ * return an array of Couch sort criteria.
+ *
+ * If no, sort criteria is provided, then this noops
+ *
+ * @param {string[] | Object[]} [sort]
+ * @returns {string[] | Object[] | undefined}
+ */
+export const mapSort = (sort) => {
+  if (!sort || !sort.length) return sort
+
+  return sort.map(cond([
+    [rIs(String), identity],
+    [
+      rIs(Object),
+      compose(
+        ([k, v]) => ({ [k]: toLower(v) }),
+        head,
+        toPairs,
+      ),
+    ],
+    [T, identity],
+  ]))
+}
+
+/**
+ * Given a hyper selector, default to an empty object
+ * if the selector is nil
+ */
+export const mapSelector = defaultTo({})
