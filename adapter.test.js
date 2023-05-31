@@ -312,6 +312,25 @@ Deno.test('adapter', async (t) => {
           assert(res.ok)
         })
 
+      // teardown
+      await adapter.removeDatabase(db)
+    })
+
+    await t.step('should default to ascending order', async () => {
+      const db = random()
+      await adapter.createDatabase(db)
+      await adapter.createDocument({ db, id: '5', doc: { val: 5 } })
+      await adapter.createDocument({ db, id: '6', doc: { val: 6 } })
+
+      await adapter.indexDocuments({
+        db,
+        name: 'val-index',
+        fields: ['val'],
+      })
+        .then((res) => {
+          assert(res.ok)
+        })
+
       await adapter.queryDocuments({
         db,
         query: {
@@ -322,6 +341,41 @@ Deno.test('adapter', async (t) => {
         },
       }).then((res) => {
         assert(res.ok)
+        assertEquals(res.docs[0].val, 5)
+        assertEquals(res.docs[1].val, 6)
+      })
+
+      // teardown
+      await adapter.removeDatabase(db)
+    })
+
+    await t.step('should accept the order provided', async () => {
+      const db = random()
+      await adapter.createDatabase(db)
+      await adapter.createDocument({ db, id: '5', doc: { val: 5 } })
+      await adapter.createDocument({ db, id: '6', doc: { val: 6 } })
+
+      await adapter.indexDocuments({
+        db,
+        name: 'val-index',
+        fields: [{ val: 'DESC' }],
+      })
+        .then((res) => {
+          assert(res.ok)
+        })
+
+      await adapter.queryDocuments({
+        db,
+        query: {
+          sort: [
+            { val: 'DESC' },
+          ],
+          use_index: 'val-index',
+        },
+      }).then((res) => {
+        assert(res.ok)
+        assertEquals(res.docs[0].val, 6)
+        assertEquals(res.docs[1].val, 5)
       })
 
       // teardown
