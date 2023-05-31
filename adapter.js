@@ -31,7 +31,7 @@ const { always, omit, isEmpty, identity, mergeRight, prop } = R
  * @typedef {Object} IndexDocumentArgs
  * @property {string} db
  * @property {string} name
- * @property {string[]} fields
+ * @property {string[] | { [field: string]: 'ASC' | 'DESC'}[]} fields
  *
  * @typedef {Object} ListDocumentArgs
  * @property {string} db
@@ -224,8 +224,6 @@ export default function ({ db: metaDb }) {
         )
     }
 
-    console.log(query.selector)
-
     return metaDb.get(db)
       .chain((db) => db.find(query))
       .map(prop('docs'))
@@ -243,23 +241,27 @@ export default function ({ db: metaDb }) {
    * @returns {Promise<Response>}
    */
   function indexDocuments({ db, name, fields }) {
-    return metaDb.get(db)
-      .chain((db) =>
-        db.createIndex({
-          index: {
-            fields,
-            name,
-            // TODO: check this. docs say put it here, but couch puts ddoc outside of index field
-            ddoc: name,
-          },
-          name,
-          ddoc: name,
-        })
-      )
-      .bichain(
-        handleHyperErr,
-        always(Async.Resolved({ ok: true })),
-      )
+    return Async.of(fields)
+      .map(mapSort)
+      .chain((fields) => {
+        return metaDb.get(db)
+          .chain((db) =>
+            db.createIndex({
+              index: {
+                fields,
+                name,
+                // TODO: check this. docs say put it here, but couch puts ddoc outside of index field
+                ddoc: name,
+              },
+              name,
+              ddoc: name,
+            })
+          )
+          .bichain(
+            handleHyperErr,
+            always(Async.Resolved({ ok: true })),
+          )
+      })
       .toPromise()
   }
 
