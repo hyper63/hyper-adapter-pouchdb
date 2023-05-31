@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.2.0](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.7...v0.2.0) (2023-05-31)
+
+
+### Features
+
+* **indexDocuments:** add support for specifying index sort direction ([15c3981](https://github.com/hyper63/hyper-adapter-pouchdb/commit/15c3981ede30f8ead056cc6c183e8e43d41ef67c))
+* **queryDocuments:** expand sort syntax support ([8dd469b](https://github.com/hyper63/hyper-adapter-pouchdb/commit/8dd469bc97274b8664398ac0db90457c1a2721b1))
+
 ## [0.1.7](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.6...v0.1.7) (2023-05-23)
 
 ### [0.1.6](https://github.com/hyper63/hyper-adapter-pouchdb/compare/v0.1.5...v0.1.6) (2022-09-02)
