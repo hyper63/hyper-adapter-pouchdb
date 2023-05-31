@@ -246,6 +246,36 @@ Deno.test('adapter', async (t) => {
       await adapter.removeDatabase(db)
     })
 
+    await t.step('should handle the string sort criteria', async () => {
+      const db = random()
+      await adapter.createDatabase(db)
+      await adapter.createDocument({ db, id: '5', doc: { val: 5 } })
+      await adapter.createDocument({ db, id: '6', doc: { val: 6 } })
+      await adapter.createDocument({ db, id: '2', doc: { val: 2 } })
+
+      await adapter.queryDocuments({
+        db,
+        query: {
+          selector: {
+            val: {
+              $gt: 4,
+            },
+          },
+          // strings are sort criteria
+          sort: ['_id'],
+        },
+      })
+        .then((res) => {
+          assert(res.ok)
+          assertEquals(res.docs.length, 2)
+          assertEquals(res.docs[0].val, 5)
+          assertEquals(res.docs[1].val, 6)
+        })
+
+      // teardown
+      await adapter.removeDatabase(db)
+    })
+
     await t.step('should query with empty selector', async () => {
       const db = random()
       await adapter.createDatabase(db)
