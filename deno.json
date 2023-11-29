@@ -1,5 +1,7 @@
 {
   "tasks": {
+    "prepare": "deno run -A npm:husky@^8 install",
+    "staged": "deno run -A npm:lint-staged@^15",
     "cache": "deno cache --lock=deno.lock --lock-write deps.js dev_deps.js",
     "test": "deno lint && deno fmt --check && deno test -A --unstable --no-check",
     "test:suite": "deno test --allow-net --allow-env --no-check --no-lock --import-map=https://raw.githubusercontent.com/hyper63/hyper/hyper-test%40v2.1.4/packages/test/import_map.json https://raw.githubusercontent.com/hyper63/hyper/hyper-test%40v2.1.4/packages/test/mod.js",
