@@ -9,15 +9,19 @@
 
 ---
 
-## Table of Contents
+<!-- toc -->
 
 - [Getting Started](#getting-started)
   - [Storage Options](#storage-options)
+  - [Storage Directory](#storage-directory)
 - [Installation](#installation)
 - [Features](#features)
 - [Methods](#methods)
 - [Contributing](#contributing)
+- [Testing](#testing)
 - [License](#license)
+
+<!-- tocstop -->
 
 ## Getting Started
 
